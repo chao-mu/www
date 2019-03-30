@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
-  "proxy": "http://localhost:5000",
   "dependencies": {
     "express": "^4.16.4"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+	"heroku-postbuild": "cd client && yarn && yarn run build"
   }
 }

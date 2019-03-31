@@ -1,31 +1,13 @@
+'use strict';
 /* Express server */
 
 const express = require('express');
 const path = require('path');
-const Sequelize = require('sequelize');
 const bodyParser = require('body-parser');
-const cors = require('cors')
+const cors = require('cors');
+const models = require('./models/');
 
 const app = express();
-
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: 'dev.sqlite'
-});
-
-const Event = sequelize.define('events', {
-  name: {
-    type: Sequelize.STRING,
-    unique: true,
-  },
-  organizer: Sequelize.STRING,
-  location: Sequelize.STRING,
-  day: Sequelize.INTEGER,
-  startTime: Sequelize.STRING,
-  endTime: Sequelize.STRING,
-  description: Sequelize.TEXT,
-  createdBy: Sequelize.STRING,
-});
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
@@ -36,16 +18,20 @@ app.use(bodyParser.json());
 // Cross-origin resource sharing
 app.use(cors());
 
+app.get('/api/events', (req, res) => {
+});
+
 // Create an event
 app.post('/api/event', (req, res) => {
-  let form = req.body;
+  let form = {};
 
   // Trim trailing/leading whitespace.
-  ["name", "organizer", "startTime", "endTime", "loc", "desc"].forEach((k) => {
-    form[k] = form[k].trim();
+  ["name", "organizer", "startTime", "endTime", "location", "description"].forEach((k) => {
+    form[k] = req.body[k].trim();
   });
+  form["day"] = req.body["day"];
 
-  Post.count({
+  models.Event.count({
     where: {
       name: form.name
     }
@@ -59,20 +45,28 @@ app.post('/api/event', (req, res) => {
       err = "Name is too long";
     } else if (!form.startTime) {
       err = "Start time is required";
-    } else if (!form.endTime) {
-      err = "End time is required";
-    } if (!form.loc) {
+    } else if (!form.startTime.match(/^\d{2}:\d{2}$/)) {
+      err = "Internal error processign start time. Contact an administrator.";
+    } else if (!form.endTime.match(/^\d{2}:\d{2}$/)) {
+      err = "Internal error processing end time. Contact an administrator.";
+    } else if (!form.location) {
       err = "Location is required";
-    } else if (form.loc.length > 60) {
+    } else if (form.location.length > 60) {
       err = "Location is too long";
-    } if (form.desc.length > 560) {
+    } if (form.description.length > 560) {
       err = "Description is too long";
-    } else if (form.desc.split(/\r\n|\r|\n/).length > 5) {
+    } else if (form.description.split(/\r\n|\r|\n/).length > 5) {
       err = "Description has too many lines";
-    } else if (!form.desc) {
+    } else if (!form.description) {
       err = "Description is required";
     } else if (!form.organizer) {
       err = "Organizer is required";
+    } else if (!form.day && form.day !== 0) {
+      err = "Day is missing. Contact an administrator";
+    } else if (!form.day.toString().match(/^\d+$/)) {
+      err = "Day not represented as integer. Contact an administrator.";
+    } else if (form.day > 4 || form.day < 0) {
+      err = "Day out of expected range. Contact an administrator.";
     }
 
     if (err) {
@@ -81,8 +75,16 @@ app.post('/api/event', (req, res) => {
       return;
     }
 
-    res.status(200);
-    res.json({});
+    models.Event.create(form).then(event => {
+      res.status(200);
+      res.json(event.values);
+    }).catch(err => {
+      res.status(400);
+      res.json({error: err.message});
+    });
+  }).catch(err => {
+    res.status(400);
+    res.json({error: err.message});
   });
 });
 

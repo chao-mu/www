@@ -69,6 +69,7 @@ class AddEvent extends React.Component {
   }
 
   handleSave = () => {
+    this.setState({success: false});
     if (!this.validateForm()) {
       return;
     }
@@ -80,8 +81,8 @@ class AddEvent extends React.Component {
       name: this.state.name,
       startTime: this.state.startTime,
       endTime: this.state.endTime,
-      loc: this.state.loc,
-      desc: this.state.desc,
+      location: this.state.loc,
+      description: this.state.desc,
       organizer: this.state.organizer
     }).then((resp) => {
       // Clear the form and communicate success. Leave it open.
@@ -91,7 +92,7 @@ class AddEvent extends React.Component {
         this.setState({pageError: err});
         return;
       }
-      
+     
       let data = err.response.data;
       if (typeof data === "object" && data.error) {
         this.setState({pageError: data.error});
@@ -105,7 +106,7 @@ class AddEvent extends React.Component {
 
   validateForm = () => {
     let okay = true;
-    
+   
     if (!this.state.name) {
       this.setState({nameError: this.requiredMsg()});
       okay = false;
@@ -115,21 +116,21 @@ class AddEvent extends React.Component {
     } else {
       this.setState({nameError: null});
     }
-    
+   
     if (!this.state.startTime) {
       this.setState({startTimeError: this.requiredMsg()});
       okay = false;
     } else {
       this.setState({startTimeError: null});
     }
-    
+   
     if (!this.state.endTime) {
       this.setState({endTimeError: this.requiredMsg()});
       okay = false;
     } else {
       this.setState({endTimeError: null});
     }
-    
+   
     if (!this.state.loc) {
       this.setState({locError: this.requiredMsg()});
       okay = false;
@@ -139,7 +140,7 @@ class AddEvent extends React.Component {
     } else {
       this.setState({locError: null});
     }
-    
+   
     if (this.state.desc.length > 560) {
       this.setState({descError: this.tooLongMsg(560)});
       okay = false;
@@ -152,7 +153,7 @@ class AddEvent extends React.Component {
     } else {
       this.setState({descError: null});
     }
-    
+   
     if (!this.state.organizer) {
       this.setState({organizerError: this.requiredMsg()});
       okay = false;
@@ -193,7 +194,7 @@ class AddEvent extends React.Component {
                 style={{marginBottom: 15}}
               />
             }
-            
+
             {/* Success message on add */}
             { this.state.success && <OurSnackbarContent
                 onClose={() => this.setState({success: false})}
@@ -202,7 +203,7 @@ class AddEvent extends React.Component {
                 style={{marginBottom: 15}}
               />
             }
-            
+           
             <Grid container spacing={8}>
               {/* Introduction */}
               <Grid item xs={12}>
@@ -214,7 +215,7 @@ class AddEvent extends React.Component {
               {/* Event name */}
               <Grid item xs={12}>
                 <TextField
-                  error={this.state.nameError !== null} 
+                  error={this.state.nameError !== null}
                   value={this.state.name}
                   autoFocus
                   onChange={(event) => this.setState({name: event.target.value})}
@@ -228,7 +229,7 @@ class AddEvent extends React.Component {
               {/* Organizer name */}
               <Grid item xs={12}>
                 <TextField
-                  error={this.state.organizerError !== null} 
+                  error={this.state.organizerError !== null}
                   value={this.state.organizer}
                   autoFocus
                   onChange={(event) => this.setState({organizer: event.target.value})}
@@ -242,7 +243,7 @@ class AddEvent extends React.Component {
               {/* Location */}
               <Grid item xs={12}>
                 <TextField
-                  error={this.state.locError !== null} 
+                  error={this.state.locError !== null}
                   value={this.state.loc}
                   autoFocus
                   onChange={(event) => this.setState({loc: event.target.value})}
@@ -266,6 +267,7 @@ class AddEvent extends React.Component {
                     <MenuItem value="1">Wednesday</MenuItem>
                     <MenuItem value="2">Thursday</MenuItem>
                     <MenuItem value="3">Friday</MenuItem>
+                    <MenuItem value="4">Saturday</MenuItem>
                   </Select>
                   <FormHelperText error>{this.state.dayError}</FormHelperText>
                 </FormControl>
@@ -309,7 +311,7 @@ class AddEvent extends React.Component {
               {/* Description */}
               <Grid item xs={12}>
                 <TextField
-                  error={this.state.descError !== null} 
+                  error={this.state.descError !== null}
                   value={this.state.desc}
                   autoFocus
                   onChange={(event) => this.setState({desc: event.target.value})}

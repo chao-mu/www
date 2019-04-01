@@ -69,7 +69,8 @@ class AddEvent extends React.Component {
   }
 
   handleSave = () => {
-    this.setState({success: false});
+    this.setState({success: false, pageError: null});
+    
     if (!this.validateForm()) {
       return;
     }
@@ -162,6 +163,10 @@ class AddEvent extends React.Component {
       okay = false;
     } else {
       this.setState({organizerError: null});
+    }
+    
+    if (!okay) {
+      this.setState({pageError: "Validation error. See fields for details."});
     }
 
     return okay;

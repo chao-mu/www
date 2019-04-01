@@ -1,4 +1,5 @@
 'use strict';
+
 /* Express server */
 
 const express = require('express');
@@ -6,6 +7,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const models = require('./models/');
+const csvStringify = require('csv-stringify');
 
 const app = express();
 
@@ -18,7 +20,47 @@ app.use(bodyParser.json());
 // Cross-origin resource sharing
 app.use(cors());
 
+// Convert an Event entity to a plain object
+let convertEvent = (event) => {
+  const days = ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  event = event.dataValues;
+  event.day = days[event.day];
+  return event;
+}
+
+// Create handler that responds with an error message
+let handleErr = (res, code) => err => {
+  let msg = typeof err === "string" ? err : err.message;
+  
+  res.status(code);
+  res.json({error: msg});
+}
+
+// Write 200 status and JSON
+let handleSuccess = (res, v) => {
+  res.status(200);
+  res.json(v);
+}
+
+// API endpoint to retrieve events
 app.get('/api/events', (req, res) => {
+  models.Event.findAll({
+    order: [
+      ["day", "ASC"],
+      ["startTime", "ASC"]
+    ],
+    attributes: ["name", "organizer", "startTime", "endTime", "location", "description", "day"]
+  }).then(
+    results => {
+      let events = results.map(convertEvent);
+      res.status(200);
+      if (req.query.format === "csv") {
+        csvStringify(events, {header: true}).pipe(res);
+      } else {
+        res.json(events);
+      }
+    }
+  ).catch(handleErr(res, 500));
 });
 
 // Create an event
@@ -70,22 +112,14 @@ app.post('/api/event', (req, res) => {
     }
 
     if (err) {
-      res.status(400);
-      res.json({error: err});
+      handleErr(res, 400)(err);
       return;
     }
 
-    models.Event.create(form).then(event => {
-      res.status(200);
-      res.json(event.values);
-    }).catch(err => {
-      res.status(400);
-      res.json({error: err.message});
-    });
-  }).catch(err => {
-    res.status(400);
-    res.json({error: err.message});
-  });
+    models.Event.create(form).then(
+      event => handleSuccess(res, convertEvent(event))
+    ).catch(handleErr(res, 500));
+  }).catch(handleErr(res, 500));
 });
 
 // The "catchall" handler: for any request that doesn't

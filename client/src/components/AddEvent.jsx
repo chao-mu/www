@@ -335,7 +335,7 @@ class AddEvent extends React.Component {
             {/* Action Buttons */}
             <DialogActions>
               <Button onClick={this.handleClose} color="primary" variant="outlined">
-                Cancel
+                Quit
               </Button>
               <Button onClick={this.handleSave} color="primary" variant="outlined">
                 Save

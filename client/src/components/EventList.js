@@ -40,7 +40,7 @@ function EventList(props) {
             {preface}
             <Paper elevation={1} className={classes.event}>
               <Typography variant="h6" component="h3">
-                <b>{event.name}</b> @ {event.location} ({event.day} {event.startTime}-{event.endTime}), <i>organized by {event.organizer}</i>
+                <b>{event.name}</b> @ {event.location} ({event.day} {event.startTime}-{event.endTime})
               </Typography>
               <Typography component="p">
                 <i>{event.description}</i>

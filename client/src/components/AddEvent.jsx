@@ -16,11 +16,12 @@ import {
   withStyles,
 } from '@material-ui/core';
 
-import OurSnackbarContent from "./OurSnackbarContent";
-
 import LoadingOverlay from 'react-loading-overlay';
 
 import axios from 'axios';
+
+import OurSnackbarContent from "./OurSnackbarContent";
+import getServerErr from "../util";
 
 const styles = theme => ({
   notice: {
@@ -43,8 +44,6 @@ class AddEvent extends React.Component {
     locError: null,
     desc: "",
     descError: null,
-    organizer: "",
-    organizerError: null,
     isLoading: false,
     pageError: null,
     success: false,
@@ -70,7 +69,7 @@ class AddEvent extends React.Component {
 
   handleSave = () => {
     this.setState({success: false, pageError: null});
-    
+
     if (!this.validateForm()) {
       return;
     }
@@ -84,30 +83,18 @@ class AddEvent extends React.Component {
       endTime: this.state.endTime,
       location: this.state.loc,
       description: this.state.desc,
-      organizer: this.state.organizer
     }).then((resp) => {
       // Clear the form and communicate success. Leave it open.
+      this.props.onAdd();
       this.setState({...this.initialState, open: true, success: true});
     }).catch((err) => {
-      if (err.response === undefined) {
-        this.setState({pageError: err});
-        return;
-      }
-     
-      let data = err.response.data;
-      if (typeof data === "object" && data.error) {
-        this.setState({pageError: data.error});
-      } else {
-        this.setState({pageError: "Unknown server error"});
-      }
-    }).then(() => {
-      this.setState({isLoading: false});
+      this.setState({pageError: getServerErr(err)});
     });
   }
 
   validateForm = () => {
     let okay = true;
-   
+
     if (!this.state.name) {
       this.setState({nameError: this.requiredMsg()});
       okay = false;
@@ -117,21 +104,21 @@ class AddEvent extends React.Component {
     } else {
       this.setState({nameError: null});
     }
-   
+
     if (!this.state.startTime) {
       this.setState({startTimeError: this.requiredMsg()});
       okay = false;
     } else {
       this.setState({startTimeError: null});
     }
-   
+
     if (!this.state.endTime) {
       this.setState({endTimeError: this.requiredMsg()});
       okay = false;
     } else {
       this.setState({endTimeError: null});
     }
-   
+
     if (!this.state.loc) {
       this.setState({locError: this.requiredMsg()});
       okay = false;
@@ -141,7 +128,7 @@ class AddEvent extends React.Component {
     } else {
       this.setState({locError: null});
     }
-   
+
     if (this.state.desc.length > 560) {
       this.setState({descError: this.tooLongMsg(560)});
       okay = false;
@@ -154,17 +141,7 @@ class AddEvent extends React.Component {
     } else {
       this.setState({descError: null});
     }
-   
-    if (!this.state.organizer) {
-      this.setState({organizerError: this.requiredMsg()});
-      okay = false;
-    } else if (this.state.organizer.length > 60) {
-      this.setState({organizerError: this.tooLongMsg(60)});
-      okay = false;
-    } else {
-      this.setState({organizerError: null});
-    }
-    
+
     if (!okay) {
       this.setState({pageError: "Validation error. See fields for details."});
     }
@@ -208,7 +185,7 @@ class AddEvent extends React.Component {
                 style={{marginBottom: 15}}
               />
             }
-           
+
             <Grid container spacing={8}>
               {/* Introduction */}
               <Grid item xs={12}>
@@ -229,20 +206,6 @@ class AddEvent extends React.Component {
                   fullWidth
                 />
                 <FormHelperText error>{this.state.nameError}</FormHelperText>
-              </Grid>
-
-              {/* Organizer name */}
-              <Grid item xs={12}>
-                <TextField
-                  error={this.state.organizerError !== null}
-                  value={this.state.organizer}
-                  autoFocus
-                  onChange={(event) => this.setState({organizer: event.target.value})}
-                  id="name"
-                  label="Organizer"
-                  fullWidth
-                />
-                <FormHelperText error>{this.state.organizerError}</FormHelperText>
               </Grid>
 
               {/* Location */}

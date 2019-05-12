@@ -13,15 +13,15 @@ module.exports = {
         allowNull: false,
         unique: true
       },
-      organizer: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
       location: {
         type: Sequelize.STRING,
         allowNull: false
       },
       day: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      createdBy: {
         type: Sequelize.INTEGER,
         allowNull: false
       },

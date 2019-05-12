@@ -6,8 +6,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true
     },
-    organizer: {
-      type: DataTypes.STRING,
+    createdBy: {
+      type: DataTypes.INTEGER,
       allowNull: false
     },
     location: {

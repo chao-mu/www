@@ -8,6 +8,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const models = require('./models/');
 const csvStringify = require('csv-stringify');
+const session = require('express-session');
+const crypto = require('crypto');
+const moment = require('moment');
 
 const app = express();
 
@@ -17,14 +20,43 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 // Parse JSON bodies
 app.use(bodyParser.json());
 
+// Sessions
+var sess = {
+  secret: process.env.SESSION_SCERET || crypto.randomBytes(64).toString('hex'),
+  cookie: {}
+};
+
+if (app.get('env') === 'production') {
+  // trust first proxy
+  app.set('trust proxy', 1)
+  // serve secure cookies
+  sess.cookie.secure = true 
+}
+
+app.use(session(sess));
+
 // Cross-origin resource sharing
 app.use(cors());
+
+// Authentication
+app.use( (req, res, next) => {
+  // Obtain user id
+  if (!req.session.userID) {
+    req.session.userID = 1;
+  }
+
+  next();
+});
+
+let fromMilitary = (time) => moment(time, 'HH:mm').format('hh:mma');
 
 // Convert an Event entity to a plain object
 let convertEvent = (event) => {
   const days = ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   event = event.dataValues;
   event.day = days[event.day];
+  event.startTime = fromMilitary(event.startTime);
+  event.endTime = fromMilitary(event.endTime);
   return event;
 }
 
@@ -49,7 +81,7 @@ app.get('/api/events', (req, res) => {
       ["day", "ASC"],
       ["startTime", "ASC"]
     ],
-    attributes: ["name", "organizer", "startTime", "endTime", "location", "description", "day"]
+    attributes: ["id", "name", "startTime", "endTime", "location", "description", "day"]
   }).then(
     results => {
       let events = results.map(convertEvent);
@@ -68,7 +100,7 @@ app.post('/api/event', (req, res) => {
   let form = {};
 
   // Trim trailing/leading whitespace.
-  ["name", "organizer", "startTime", "endTime", "location", "description"].forEach((k) => {
+  ["name", "startTime", "endTime", "location", "description"].forEach((k) => {
     form[k] = req.body[k].trim();
   });
   form["day"] = req.body["day"];
@@ -101,8 +133,6 @@ app.post('/api/event', (req, res) => {
       err = "Description has too many lines";
     } else if (!form.description) {
       err = "Description is required";
-    } else if (!form.organizer) {
-      err = "Organizer is required";
     } else if (!form.day && form.day !== 0) {
       err = "Day is missing. Contact an administrator";
     } else if (!form.day.toString().match(/^\d+$/)) {
@@ -115,6 +145,8 @@ app.post('/api/event', (req, res) => {
       handleErr(res, 400)(err);
       return;
     }
+
+    form["createdBy"] = req.session.userID;
 
     models.Event.create(form).then(
       event => handleSuccess(res, convertEvent(event))

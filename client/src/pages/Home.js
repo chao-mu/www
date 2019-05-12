@@ -4,11 +4,34 @@ import {
   Typography,
   Button,
 } from '@material-ui/core';
+import LoadingOverlay from 'react-loading-overlay';
 
 import EventList from '../components/EventList';
 import AddEvent from '../components/AddEvent';
+import getServerErr from '../util';
 
 class Home extends React.Component {
+  state = {
+    events: [],
+    eventsLoaded: false
+  };
+
+  reloadEvents = () => {
+    axios({
+      url: "/api/events?format=json",
+      method: 'GET'
+    }).then((response) => {
+      console.log(response.data);
+      this.setState({events: response.data, eventsLoaded: true});
+    }).catch((err) => {
+      console.debug("Error! " + getServerErr(err));
+    });
+  }
+
+  componentWillMount() {
+    this.reloadEvents();
+  }
+
   onExport = () => {
     axios({
       url: '/api/events?format=csv',
@@ -23,22 +46,28 @@ class Home extends React.Component {
       link.click();
     });
   }
-  
+
   render() {
-    return <div>
-      <Typography variant="display1">What/Where/When</Typography>
-      <Typography variant="body1" paragraph={true}>
-        Before you lies the comings and goings of events at Firefly. Like most aspects of Firefly, every event is participant organized and driven. Feel free to add an event you are organizing!
-      </Typography>
-      <Button variant="outlined" color="primary">
-        Print
-      </Button>
-      <Button variant="outlined" color="default" onClick={this.onExport}>
-        Export
-      </Button>
-      <AddEvent/>
-      <EventList/>
-    </div>
+    return <LoadingOverlay
+        active={!this.state.eventsLoaded}
+        spinner
+        text='Contacting the other side...'
+      >
+        <div>
+          <Typography variant="display1">What/Where/When</Typography>
+          <Typography variant="body1" paragraph={true}>
+            Before you lies the comings and goings of events at Firefly. Like most aspects of Firefly, every event is participant organized and driven. Feel free to add an event you are organizing!
+          </Typography>
+          <Button variant="outlined" color="primary">
+            Print
+          </Button>
+          <Button variant="outlined" color="default" onClick={this.onExport}>
+            Export
+          </Button>
+          <AddEvent onAdd={this.reloadEvents}/>
+          <EventList events={this.state.events}/>
+        </div>
+      </LoadingOverlay>;
   };
 }
 

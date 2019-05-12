@@ -18,14 +18,7 @@ const styles = theme => ({
 
 function EventList(props) {
   //(events, ...other) = props;
-  const {classes, ...other} = props;
-  
-  const events = [
-    {name:"Happy Hour",organizer:"Bring a Cup",startTime:"12:55",endTime:"12:55",location:"Bring a Cup",description:"Come have some beers with other fun folks and lah lah lah lah",day:"Tuesday"},
-    {name:"Happy Hour",organizer:"Bring a Cup",startTime:"12:55",endTime:"12:55",location:"Bring a Cup",description:"Come have some beers with other fun folks and lah lah lah lah",day:"Tuesday"},
-    {name:"Happy Hour",organizer:"Bring a Cup",startTime:"12:55",endTime:"12:55",location:"Bring a Cup",description:"Come have some beers with other fun folks and lah lah lah lah",day:"Wednesday"},
-    {name:"Happy Hour",organizer:"Bring a Cup",startTime:"12:55",endTime:"12:55",location:"Bring a Cup",description:"Come have some beers with other fun folks and lah lah lah lah",day:"Thursday"},
-  ];
+  const {classes, events, ...other} = props;
 
   let lastDay = null;
   return (
@@ -36,7 +29,7 @@ function EventList(props) {
           preface = <h2 className={classes.dayHeader}>{event.day}</h2>;
           lastDay = event.day;
         }
-        return <span>
+        return <span key={event.id}>
             {preface}
             <Paper elevation={1} className={classes.event}>
               <Typography variant="h6" component="h3">

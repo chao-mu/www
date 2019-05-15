@@ -1,15 +1,9 @@
 import React from 'react';
-import {
-  Paper,
-  Typography,
-  withStyles
-} from '@material-ui/core'
 
 import "./EventList.css"
 
 function EventList(props) {
-  //(events, ...other) = props;
-  const {classes, events, ...other} = props;
+  const {classes, events} = props;
 
   let byDay = {};
   events.forEach(e => {

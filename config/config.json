@@ -8,7 +8,6 @@
     "storage": "test.sqlite3"
   },
   "production": {
-    "dialect": "sqlite",
-    "storage": "production.sqlite3"
+    "use_env_variable": "DATABASE_URL"
   }
 }

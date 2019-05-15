@@ -88,7 +88,7 @@ class AddEvent extends React.Component {
       this.props.onAdd();
       this.setState({...this.initialState, open: true, success: true});
     }).catch((err) => {
-      this.setState({pageError: getServerErr(err)});
+      this.setState({pageError: getServerErr(err), isLoading: false});
     });
   }
 

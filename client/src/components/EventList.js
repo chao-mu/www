@@ -5,44 +5,55 @@ import {
   withStyles
 } from '@material-ui/core'
 
-const styles = theme => ({
-  event: {
-    margin: 5,
-    padding: 15,
-  },
-  dayHeader: {
-    marginTop: 15,
-    marginBottom: 5,
-  }
-});
+import "./EventList.css"
 
 function EventList(props) {
   //(events, ...other) = props;
   const {classes, events, ...other} = props;
 
-  let lastDay = null;
+  let byDay = {};
+  events.forEach(e => {
+    if (!byDay[e.day]) {
+      byDay[e.day] = [];
+    }
+
+    byDay[e.day].push(e);
+  });
+
   return (
-    <span>
-      {events.map(event => {
-        let preface = <span/>;
-        if (lastDay === null || lastDay !== event.day)  {
-          preface = <h2 className={classes.dayHeader}>{event.day}</h2>;
-          lastDay = event.day;
-        }
-        return <span key={event.id}>
-            {preface}
-            <Paper elevation={1} className={classes.event}>
-              <Typography variant="h6" component="h3">
-                <b>{event.name}</b> @ {event.location} ({event.day} {event.startTime}-{event.endTime})
-              </Typography>
-              <Typography component="p">
-                <i>{event.description}</i>
-              </Typography>
-            </Paper>
-          </span>;
-      })}
-    </span>
+    <table className="eventTable">
+      {
+        Object.keys(byDay).map(day => (
+          <React.Fragment key={day}>
+            <tbody>
+              <tr className="greyed">
+                <td colSpan={3}>
+                  <center>
+                    <h2 className="day">{day}</h2>
+                  </center>
+                </td>
+              </tr>
+            </tbody>
+            {
+              byDay[day].map(e => (
+                <tbody className="event" key={e.id}>
+                  <tr className="greyed">
+                    <td className="duration">{e.startTime} - {e.endTime}</td>
+                    <td><b>{e.name}</b></td>
+                    <td><b>{e.location}</b></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td colSpan={2} className="desc">{e.description}</td>
+                  </tr>
+                </tbody>
+              ))
+            }
+          </React.Fragment>
+        ))
+      }
+    </table>
   );
 }
 
-export default withStyles(styles)(EventList);
+export default EventList;

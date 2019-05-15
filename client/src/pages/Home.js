@@ -21,7 +21,6 @@ class Home extends React.Component {
       url: "/api/events?format=json",
       method: 'GET'
     }).then((response) => {
-      console.log(response.data);
       this.setState({events: response.data, eventsLoaded: true});
     }).catch((err) => {
       console.debug("Error! " + getServerErr(err));
@@ -54,17 +53,19 @@ class Home extends React.Component {
         text='Contacting the other side...'
       >
         <div>
-          <Typography variant="display1">What/Where/When</Typography>
-          <Typography variant="body1" paragraph={true}>
-            Before you lies the comings and goings of events at Firefly. Like most aspects of Firefly, every event is participant organized and driven. Feel free to add an event you are organizing!
-          </Typography>
-          <Button variant="outlined" color="primary">
-            Print
-          </Button>
-          <Button variant="outlined" color="default" onClick={this.onExport}>
-            Export
-          </Button>
-          <AddEvent onAdd={this.reloadEvents}/>
+          <div className="no-print">
+            <Typography variant="display1">What/Where/When</Typography>
+            <Typography variant="body1" paragraph={true}>
+              Before you lies the comings and goings of events at Firefly. Like other aspects of Firefly, events are participant organized and run. Feel free to add an event you are organizing!
+            </Typography>
+            <Button variant="outlined" color="primary" onClick={() => window.print()}>
+              Print
+            </Button>
+            <Button variant="outlined" color="default" onClick={this.onExport}>
+              Export
+            </Button>
+            <AddEvent onAdd={this.reloadEvents}/>
+          </div>
           <EventList events={this.state.events}/>
         </div>
       </LoadingOverlay>;

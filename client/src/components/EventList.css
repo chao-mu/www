@@ -1,0 +1,35 @@
+@media print {
+    .no-print {
+        display: none;
+    }
+    .eventTable !important {
+        display: block;
+    }
+}
+
+.greyed {
+    background-color: #f1f1f1;
+}
+
+.eventTable {
+    border: 1px solid #d1d1d1;
+    border-collapse:collapse;
+    width: 100%;
+}
+
+.eventTable .desc {
+    width: 80%;
+}
+
+.eventTable .event td {
+    border: 1px solid #d1d1d1;
+    padding: 10px;
+}
+
+.eventTable .event .duration {
+    text-align: center;
+}
+
+.eventTable .day {
+    margin: 10px;
+}

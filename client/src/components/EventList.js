@@ -23,7 +23,7 @@ function EventList(props) {
               <tr className="greyed">
                 <td colSpan={3}>
                   <center>
-                    <h2 className="day">{day}</h2>
+                    <h3 className="day">{day}</h3>
                   </center>
                 </td>
               </tr>

@@ -5,14 +5,12 @@ import {
   Typography,
 } from '@material-ui/core';
 
+import "./AppHeader.scss";
+
 const AppHeader = () => (
-  <AppBar position="static" className="no-print">
-    <Toolbar>
-      <Typography variant="title" color="inherit">
-        Firefly Event Guide
-      </Typography>
-    </Toolbar>
-  </AppBar>
+  <div className="no-print appbar">
+    <h1 className="logo">Firefly Event Guide</h1>
+  </div>
 );
 
 export default AppHeader;

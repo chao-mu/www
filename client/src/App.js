@@ -6,6 +6,7 @@ import {
 
 import AppHeader from './components/AppHeader';
 import Home from './pages/Home';
+import './App.scss';
 
 const styles = theme => ({
   main: {

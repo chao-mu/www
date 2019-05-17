@@ -9,6 +9,8 @@ import EventList from '../components/EventList';
 import AddEvent from '../components/AddEvent';
 import getServerErr from '../util';
 
+import "./Home.scss";
+
 class Home extends React.Component {
   state = {
     events: [],
@@ -46,12 +48,12 @@ class Home extends React.Component {
   }
 
   render() {
-    return <div>
+    return <div className="home">
       <div className="no-print">
-        <Typography variant="display1">What/Where/When</Typography>
-        <Typography variant="body1" paragraph={true}>
-          Before you lies the comings and goings of events at Firefly. Like other aspects of Firefly, events are participant organized and run. Feel free to add an event you are organizing!
-        </Typography>
+        <h2>What/Where/When</h2>
+        <p className="intro">
+          Before you lies your next adventure. Like other aspects of Firefly, events are self-organized - so add an event and make it happen!
+        </p>
         <Button variant="outlined" color="primary" onClick={() => window.print()}>
           Print
         </Button>

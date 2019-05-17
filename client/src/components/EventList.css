@@ -31,9 +31,9 @@
 }
 
 .eventTable .day {
-    margin: 10px;
-}
-
-.eventTable h3 {
+    font-size: 1.5em;
+    margin: 8px 0 5px 0;
+    display: inline-block;
+    font-weight: 500;
     color: black;
 }

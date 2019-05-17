@@ -3,7 +3,7 @@ import React from 'react';
 import "./EventList.css"
 
 function EventList(props) {
-  const {classes, events} = props;
+  const {events} = props;
 
   let byDay = {};
   events.forEach(e => {

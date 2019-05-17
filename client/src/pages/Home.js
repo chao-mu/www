@@ -1,7 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import {
-  Typography,
   Button,
 } from '@material-ui/core';
 
@@ -52,7 +51,7 @@ class Home extends React.Component {
       <div className="no-print">
         <h2>What/Where/When</h2>
         <p className="intro">
-          Before you lies your next adventure. Like other aspects of Firefly, events are self-organized - so add an event and make it happen!
+          Before you lies your next adventure. Like other aspects of Firefly, events are self-organized. Add an event and make it happen!
         </p>
         <Button variant="outlined" color="primary" onClick={() => window.print()}>
           Print

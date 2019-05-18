@@ -22,6 +22,7 @@ import axios from 'axios';
 
 import OurSnackbarContent from "./OurSnackbarContent";
 import getServerErr from "../util";
+import EventDialog from "./EventDialog";
 
 const styles = theme => ({
   notice: {

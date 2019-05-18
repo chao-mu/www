@@ -11,6 +11,16 @@ import {
   IconButton
 } from '@material-ui/core';
 
+import moment from 'moment';
+
+function convertDay(day) {
+  return ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][day]
+}
+
+function convertTime(time) {
+  return moment(time, 'HH:mm').format('hh:mma');
+}
+
 function EventList(props) {
   const {events} = props;
 
@@ -27,12 +37,12 @@ function EventList(props) {
     <table className="eventTable">
       {
         Object.keys(byDay).map(day => (
-          <React.Fragment key={day}>
+          <React.Fragment key={"day-" + day}>
             <tbody className="day-header">
               <tr className="greyed">
                 <td colSpan={3}>
                   <center>
-                    <h2 className="day">{day}</h2>
+                    <h2 className="day">{convertDay(day)}</h2>
                   </center>
                 </td>
               </tr>
@@ -41,7 +51,9 @@ function EventList(props) {
               byDay[day].map(e => (
                 <tbody className="event" key={e.id}>
                   <tr className="greyed">
-                    <td className="duration">{e.startTime} - {e.endTime}</td>
+                    <td className="duration">
+                      {convertTime(e.startTime)} - {convertTime(e.endTime)}
+                    </td>
                     <td>
                       <b>{e.name}</b>
                     </td>

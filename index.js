@@ -30,7 +30,7 @@ if (app.get('env') === 'production') {
   // trust first proxy
   app.set('trust proxy', 1)
   // serve secure cookies
-  sess.cookie.secure = true 
+  sess.cookie.secure = true
 }
 
 app.use(session(sess));
@@ -50,8 +50,8 @@ app.use( (req, res, next) => {
 
 let fromMilitary = (time) => moment(time, 'HH:mm').format('hh:mma');
 
-// Convert an Event entity to a plain object
-let convertEvent = (event) => {
+// Convert an Event entity to a displayable plain object
+let convertEventDisplayable = (event) => {
   const days = ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   event = event.dataValues;
   event.day = days[event.day];
@@ -63,7 +63,7 @@ let convertEvent = (event) => {
 // Create handler that responds with an error message
 let handleErr = (res, code) => err => {
   let msg = typeof err === "string" ? err : err.message;
-  
+
   res.status(code);
   res.json({error: msg});
 }
@@ -84,11 +84,12 @@ app.get('/api/events', (req, res) => {
     attributes: ["id", "name", "startTime", "endTime", "location", "description", "day"]
   }).then(
     results => {
-      let events = results.map(convertEvent);
       res.status(200);
       if (req.query.format === "csv") {
+        let events = results.map((e) => convertEventDisplayable(e));
         csvStringify(events, {header: true}).pipe(res);
       } else {
+        let events = results.map((e) => e.dataValues);
         res.json(events);
       }
     }

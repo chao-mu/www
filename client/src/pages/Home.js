@@ -5,7 +5,7 @@ import {
 } from '@material-ui/core';
 
 import EventList from '../components/EventList';
-import AddEvent from '../components/AddEvent';
+import EventDialog from '../components/EventDialog';
 import getServerErr from '../util';
 
 import "./Home.scss";
@@ -59,7 +59,11 @@ class Home extends React.Component {
         <Button variant="outlined" color="default" onClick={this.onExport}>
           Export
         </Button>
-        <AddEvent onAdd={this.reloadEvents}/>
+        <EventDialog onSuccess={this.reloadEvents}>
+          <Button variant="outlined" color="default">
+            Add Event
+          </Button>
+        </EventDialog>
       </div>
       <EventList events={this.state.events}/>
     </div>

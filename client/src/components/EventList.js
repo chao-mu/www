@@ -11,6 +11,8 @@ import {
   IconButton
 } from '@material-ui/core';
 
+import EventDialog from './EventDialog';
+
 import moment from 'moment';
 
 function convertDay(day) {
@@ -64,9 +66,11 @@ function EventList(props) {
                   <tr>
                     <td className="actionsCell">
                       <div className="actions no-print">
-                        <IconButton fontSize="small" >
-                          <Edit />
-                        </IconButton>
+                        <EventDialog event={e}>
+                          <IconButton fontSize="small" >
+                            <Edit />
+                          </IconButton>
+                        </EventDialog>
                         <IconButton fontSize="small">
                           <Delete />
                         </IconButton>

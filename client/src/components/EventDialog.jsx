@@ -16,10 +16,12 @@ import {
   withStyles,
 } from '@material-ui/core';
 
-
 import LoadingOverlay from 'react-loading-overlay';
 
+import axios from 'axios';
+
 import OurSnackbarContent from "./OurSnackbarContent";
+import getServerErr from "../util";
 
 const styles = theme => ({
   notice: {
@@ -28,29 +30,41 @@ const styles = theme => ({
 });
 
 class EventDialog extends React.Component {
-  state = {
-    day: this.props.event.day,
-    dayError: null,
-    name: this.props.event.name,
-    nameError: null,
-    startTime: this.props.event.startTime,
-    startTimeError: null,
-    endTime: this.props.event.endTime,
-    endTimeError: null,
-    location: this.props.event.location,
-    locationError: null,
-    description: this.props.event.description,
-    descriptionError: null,
-    success: false,
-    validationError: null,
+  getEventField = (field) => {
+    return this.isEditMode() ? this.props.event[field] : null;
   };
 
-  getError = () => {
-    return this.props.error !== null ? this.props.error : this.state.validationError;
+  isEditMode = () => {
+    return this.props.event ? true : false;
+  };
+
+  initialState = {
+    open: false,
+    day: this.getEventField("day") || 0,
+    dayError: null,
+    name: this.getEventField("name") || "",
+    nameError: null,
+    startTime: this.getEventField("startTime") || "",
+    startTimeError: null,
+    endTime: this.getEventField("endTime") || "",
+    endTimeError: null,
+    location: this.getEventField("location") || "",
+    locationError: null,
+    description: this.getEventField("description") || "",
+    descriptionError: null,
+    isLoading: false,
+    pageError: null,
+    success: false,
+  };
+
+  state = this.initialState;
+
+  handleClickOpen = () => {
+    this.setState({ open: true });
   };
 
   handleClose = () => {
-    this.props.handleClose();
+    this.setState({ open: false });
   };
 
   tooLongMsg = (maxLength) => {
@@ -62,18 +76,28 @@ class EventDialog extends React.Component {
   }
 
   handleSave = () => {
+    this.setState({success: false, pageError: null});
+
     if (!this.validateForm()) {
       return;
     }
 
-    this.props.handleSave({
+    this.setState({isLoading: true});
+
+    axios.post("/api/event", {
+      id: this.getEventField("id"),
       day: this.state.day,
       name: this.state.name,
       startTime: this.state.startTime,
       endTime: this.state.endTime,
       location: this.state.location,
       description: this.state.description,
-      id: this.props.id
+    }).then((resp) => {
+      // Clear the form and communicate success. Leave it open.
+      this.props.onSuccess();
+      this.setState({...this.initialState, open: true, success: true});
+    }).catch((err) => {
+      this.setState({pageError: getServerErr(err), isLoading: false});
     });
   }
 
@@ -105,66 +129,71 @@ class EventDialog extends React.Component {
     }
 
     if (!this.state.location) {
-      this.setState({locationError: this.requiredMsg()});
+      this.setState({locError: this.requiredMsg()});
       okay = false;
     } else if (this.state.location.length > 60) {
-      this.setState({locationError: this.tooLongMsg(60)});
+      this.setState({locError: this.tooLongMsg(60)});
       okay = false;
     } else {
-      this.setState({locationError: null});
+      this.setState({locError: null});
     }
 
     if (this.state.description.length > 560) {
-      this.setState({descriptionError: this.tooLongMsg(560)});
+      this.setState({descError: this.tooLongMsg(560)});
       okay = false;
     } else if (this.state.description.split(/\r\n|\r|\n/).length > 5) {
-      this.setState({descriptionError: "Field has too many lines. Must be no more than 5 lines"});
+      this.setState({descError: "Field has too many lines. Must be no more than 5 lines"});
       okay = false;
     } else if (!this.state.description) {
-      this.setState({descriptionError: this.requiredMsg()});
+      this.setState({descError: this.requiredMsg()});
       okay = false;
-    } else {
-      this.setState({descriptionError: null});
+    } else { this.setState({descError: null});
     }
 
     if (!okay) {
-      this.setState({validationError: "Validation error. See fields for details."});
+      this.setState({pageError: "Validation error. See fields for details."});
     }
 
     return okay;
   };
 
-
   render() {
     return (
+      <React.Fragment>
+        {
+          React.cloneElement(this.props.children, {
+            onClick: this.handleClickOpen
+          })
+        }
         <Dialog
-          open={this.props.open}
-          onClose={this.props.handleClose}
+          open={this.state.open}
+          onClose={this.handleClose}
           aria-labelledby="form-dialog-title"
         >
           <LoadingOverlay
-            active={this.props.isLoading}
+            active={this.state.isLoading}
             spinner
             text='Contacting the other side...'
           >
 
-          <DialogTitle id="form-dialog-title">Add Event</DialogTitle>
+          <DialogTitle id="form-dialog-title">{this.isEditMode() ? "Edit" : "Add"} Event</DialogTitle>
           <DialogContent>
             {/* Error message on server fail */}
-            { this.getError() !== null && <OurSnackbarContent
-                variant="error"
-                message={this.getError()}
-                style={{marginBottom: 15}}
-              />
+            { this.state.pageError !== null && <OurSnackbarContent
+              onClose={() => this.setState({pageError: null})}
+              variant="error"
+              message={this.state.pageError}
+              style={{marginBottom: 15}}
+            />
             }
 
             {/* Success message on add */}
             { this.state.success && <OurSnackbarContent
-                onClose={() => this.setState({success: false})}
-                variant="success"
-                message="Event added!"
-                style={{marginBottom: 15}}
-              />
+              onClose={() => this.setState({success: false})}
+              variant="success"
+              message="Event added!"
+              style={{marginBottom: 15}}
+            />
             }
 
             <Grid container spacing={8}>
@@ -263,7 +292,7 @@ class EventDialog extends React.Component {
                   error={this.state.descriptionError !== null}
                   value={this.state.description}
                   autoFocus
-                  onChange={(event) => this.setState({description: event.target.value})}
+                  onChange={(event) => this.setState({desc: event.target.value})}
                   rows="5"
                   variant="outlined"
                   id="name"
@@ -288,8 +317,9 @@ class EventDialog extends React.Component {
           </DialogContent>
         </LoadingOverlay>
       </Dialog>
+
+    </React.Fragment>
     );
   }
 }
-
 export default withStyles(styles)(EventDialog);

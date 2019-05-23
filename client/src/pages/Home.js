@@ -6,6 +6,7 @@ import {
 
 import EventList from '../components/EventList';
 import EventDialog from '../components/EventDialog';
+import Auth from '../Auth';
 import getServerErr from '../util';
 
 import "./Home.scss";
@@ -16,7 +17,7 @@ class Home extends React.Component {
     eventsLoaded: false
   };
 
-  reloadEvents = () => {
+  reloadEvents() {
     axios({
       url: "/api/events?format=json",
       method: 'GET'
@@ -31,7 +32,7 @@ class Home extends React.Component {
     this.reloadEvents();
   }
 
-  onExport = () => {
+  onExport() {
     axios({
       url: '/api/events?format=csv',
       method: 'GET',
@@ -46,6 +47,11 @@ class Home extends React.Component {
     });
   }
 
+  login() {
+    const auth = new Auth();
+    auth.login();
+  }
+
   render() {
     return <div className="home">
       <div className="no-print">
@@ -53,17 +59,29 @@ class Home extends React.Component {
         <p className="intro">
           Before you lies your next adventure. Like other aspects of Firefly, events are self-organized. Add an event and make it happen!
         </p>
-        <Button variant="outlined" color="primary" onClick={() => window.print()}>
-          Print
-        </Button>
-        <Button variant="outlined" color="default" onClick={this.onExport}>
-          Export
-        </Button>
-        <EventDialog onSuccess={this.reloadEvents}>
-          <Button variant="outlined" color="default">
-            Add Event
+        <div className="button-panel-left">
+          <Button variant="outlined" color="primary" onClick={() => window.print()}>
+            Print
           </Button>
-        </EventDialog>
+          <Button variant="outlined" color="default" onClick={this.onExport}>
+            Export
+          </Button>
+          <EventDialog onSuccess={this.reloadEvents}>
+            <Button variant="outlined" color="default">
+              Add
+            </Button>
+          </EventDialog>
+        </div>
+        <div className="button-panel-right">
+          <Button
+            variant="outlined"
+            size="medium"
+            color="default"
+            onClick={this.login}
+          >
+            Login
+          </Button>
+        </div>
       </div>
       <EventList events={this.state.events}/>
     </div>

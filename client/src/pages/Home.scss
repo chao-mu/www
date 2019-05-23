@@ -3,4 +3,11 @@
         font-size: 1.3em;
         margin: 5px 0px 8px 0px;
     }
+    .button-panel-left {
+        display: inline-block;
+    }
+    .button-panel-right {
+        display: inline-block;
+        float: right;
+    }
 }

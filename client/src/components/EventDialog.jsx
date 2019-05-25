@@ -23,6 +23,8 @@ import axios from 'axios';
 import OurSnackbarContent from "./OurSnackbarContent";
 import getServerErr from "../util";
 
+import authClient from '../Auth';
+
 const styles = theme => ({
   notice: {
     marginBottom: 15
@@ -92,6 +94,8 @@ class EventDialog extends React.Component {
       endTime: this.state.endTime,
       location: this.state.location,
       description: this.state.description,
+    }, {
+      headers: { 'Authorization': `Bearer ${authClient.getIdToken()}` }
     }).then((resp) => {
       // Clear the form and communicate success. Leave it open.
       this.props.onSuccess();
@@ -224,7 +228,7 @@ class EventDialog extends React.Component {
                   error={this.state.locationError !== null}
                   value={this.state.location}
                   autoFocus
-                  onChange={(event) => this.setState({loc: event.target.value})}
+                  onChange={(event) => this.setState({location: event.target.value})}
                   id="name"
                   label="Location"
                   fullWidth
@@ -292,7 +296,7 @@ class EventDialog extends React.Component {
                   error={this.state.descriptionError !== null}
                   value={this.state.description}
                   autoFocus
-                  onChange={(event) => this.setState({desc: event.target.value})}
+                  onChange={(event) => this.setState({description: event.target.value})}
                   rows="5"
                   variant="outlined"
                   id="name"

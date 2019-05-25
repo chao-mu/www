@@ -6,15 +6,14 @@ import {
 
 import EventList from '../components/EventList';
 import EventDialog from '../components/EventDialog';
-import Auth from '../Auth';
+import authClient from '../Auth';
 import getServerErr from '../util';
 
 import "./Home.scss";
 
 class Home extends React.Component {
   state = {
-    events: [],
-    eventsLoaded: false
+    events: []
   };
 
   reloadEvents() {
@@ -22,7 +21,7 @@ class Home extends React.Component {
       url: "/api/events?format=json",
       method: 'GET'
     }).then((response) => {
-      this.setState({events: response.data, eventsLoaded: true});
+      this.setState({events: response.data});
     }).catch((err) => {
       console.debug("Error! " + getServerErr(err));
     });
@@ -47,11 +46,6 @@ class Home extends React.Component {
     });
   }
 
-  login() {
-    const auth = new Auth();
-    auth.login();
-  }
-
   render() {
     return <div className="home">
       <div className="no-print">
@@ -66,21 +60,44 @@ class Home extends React.Component {
           <Button variant="outlined" color="default" onClick={this.onExport}>
             Export
           </Button>
-          <EventDialog onSuccess={this.reloadEvents}>
-            <Button variant="outlined" color="default">
-              Add
-            </Button>
-          </EventDialog>
+          {
+            authClient.isAuthenticated() &&
+              <EventDialog onSuccess={() => this.reloadEvents()}>
+                <Button variant="outlined" color="default">
+                  Add
+                </Button>
+              </EventDialog>
+          }
+          {
+            !authClient.isAuthenticated() &&
+              <Button variant="outlined" color="default" onClick={() => authClient.login()}>
+                Add
+              </Button>
+          }
         </div>
         <div className="button-panel-right">
-          <Button
-            variant="outlined"
-            size="medium"
-            color="default"
-            onClick={this.login}
-          >
-            Login
-          </Button>
+          {
+            !authClient.isAuthenticated() &&
+              <Button
+                variant="outlined"
+                size="medium"
+                color="default"
+                onClick={() => authClient.login()}
+              >
+                Login
+              </Button>
+          }
+          {
+            authClient.isAuthenticated() &&
+              <Button
+                variant="outlined"
+                size="medium"
+                color="default"
+                onClick={() => authClient.logout()}
+              >
+                Logout
+              </Button>
+          }
         </div>
       </div>
       <EventList events={this.state.events}/>

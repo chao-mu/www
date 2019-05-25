@@ -8,11 +8,13 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const models = require('./models/');
 const csvStringify = require('csv-stringify');
-const session = require('express-session');
 const crypto = require('crypto');
 const moment = require('moment');
+const jwt = require('express-jwt');
+const jwksRsa = require('jwks-rsa');
 
 const app = express();
+
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
@@ -20,33 +22,8 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 // Parse JSON bodies
 app.use(bodyParser.json());
 
-// Sessions
-var sess = {
-  secret: process.env.SESSION_SCERET || crypto.randomBytes(64).toString('hex'),
-  cookie: {}
-};
-
-if (app.get('env') === 'production') {
-  // trust first proxy
-  app.set('trust proxy', 1)
-  // serve secure cookies
-  sess.cookie.secure = true
-}
-
-app.use(session(sess));
-
 // Cross-origin resource sharing
 app.use(cors());
-
-// Authentication
-app.use( (req, res, next) => {
-  // Obtain user id
-  if (!req.session.userID) {
-    req.session.userID = 1;
-  }
-
-  next();
-});
 
 let fromMilitary = (time) => moment(time, 'HH:mm').format('hh:mma');
 
@@ -96,8 +73,22 @@ app.get('/api/events', (req, res) => {
   ).catch(handleErr(res, 500));
 });
 
-// Create an event
-app.post('/api/event', (req, res) => {
+const checkJwt = jwt({
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: 'https://dev-www.auth0.com/.well-known/jwks.json'
+  }),
+
+  // Validate the audience and the issuer.
+  audience: '4qhDa1YiGaMibkZr0zKH0Tcx4nbzsg90',
+  issuer: 'https://dev-www.auth0.com/',
+  algorithms: ['RS256']
+});
+
+// Create or save an event
+app.post('/api/event', checkJwt, (req, res) => {
   let form = {};
 
   // Trim trailing/leading whitespace.
@@ -147,10 +138,10 @@ app.post('/api/event', (req, res) => {
       return;
     }
 
-    form["createdBy"] = req.session.userID;
+    form["createdBy"] = req.user.sub;
 
     models.Event.create(form).then(
-      event => handleSuccess(res, convertEvent(event))
+      event => handleSuccess(res, {})
     ).catch(handleErr(res, 500));
   }).catch(handleErr(res, 500));
 });

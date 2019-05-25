@@ -7,6 +7,9 @@ import {
 import AppHeader from './components/AppHeader';
 import Home from './pages/Home';
 import './App.scss';
+import authClient from './Auth'
+
+import {withRouter, Route} from 'react-router-dom';
 
 const styles = theme => ({
   main: {
@@ -17,14 +20,37 @@ const styles = theme => ({
   },
 });
 
-const App = ({ classes }) => (
-  <Fragment>
-    <CssBaseline />
-    <AppHeader />
-    <main className={classes.main}>
-      <Home />
-    </main>
-  </Fragment>
-);
+class App extends React.Component {
+  async componentDidMount() {
+    if (this.props.location.pathname === '/callback') {
+      try {
+        await authClient.handleAuthentication();
+      } catch (err) {
+        // ignore
+      }
+      this.props.history.replace('/');
+    } else {
+      try {
+        await authClient.silentAuth();
+        this.forceUpdate();
+      } catch (err) {
+        // Ignore
+      }
+    }
+  }
 
-export default withStyles(styles)(App);
+  render() {
+    const {classes} = this.props;
+    return (
+      <Fragment>
+        <CssBaseline />
+        <AppHeader />
+        <main className={classes.main}>
+          <Route exact path="/" component={Home}/>
+        </main>
+      </Fragment>
+    );
+  }
+};
+
+export default withRouter(withStyles(styles)(App));

@@ -51,7 +51,7 @@ function EventList(props) {
             </tbody>
             {
               byDay[day].map(e => (
-                <tbody className="event" key={e.id}>
+                <tbody className="event" key={"event-" + e.id}>
                   <tr className="greyed">
                     <td className="duration">
                       {convertTime(e.startTime)} - {convertTime(e.endTime)}

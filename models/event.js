@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       unique: true
     },
     createdBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false
     },
     location: {

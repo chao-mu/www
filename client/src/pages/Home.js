@@ -100,7 +100,7 @@ class Home extends React.Component {
           }
         </div>
       </div>
-      <EventList events={this.state.events}/>
+      <EventList events={this.state.events} onChange={() => this.reloadEvents()}/>
     </div>
   };
 }

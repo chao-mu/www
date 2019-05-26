@@ -12,6 +12,9 @@ const crypto = require('crypto');
 const moment = require('moment');
 const jwt = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
+const sequelize = require('sequelize');
+
+const Op = sequelize.Op;
 
 const app = express();
 
@@ -34,12 +37,15 @@ let convertEventDisplayable = (event) => {
   event.day = days[event.day];
   event.startTime = fromMilitary(event.startTime);
   event.endTime = fromMilitary(event.endTime);
+  delete event.createdBy;
   return event;
 }
 
+let getErr = (err) => typeof err === "string" ? err : err.message;
+
 // Create handler that responds with an error message
 let handleErr = (res, code) => err => {
-  let msg = typeof err === "string" ? err : err.message;
+  let msg = getErr(err);
 
   res.status(code);
   res.json({error: msg});
@@ -58,7 +64,7 @@ app.get('/api/events', (req, res) => {
       ["day", "ASC"],
       ["startTime", "ASC"]
     ],
-    attributes: ["id", "name", "startTime", "endTime", "location", "description", "day"]
+    attributes: ["id", "createdBy", "name", "startTime", "endTime", "location", "description", "day"]
   }).then(
     results => {
       res.status(200);
@@ -87,8 +93,32 @@ const checkJwt = jwt({
   algorithms: ['RS256']
 });
 
+function findAuthoredEvent(id, sub) {
+  if (id === null && id === undefined) {
+    return null;
+  }
+
+  return models.Event.findOne({
+    where: {
+      id: id,
+      createdBy: sub
+    }
+  });
+}
+
+app.delete("/api/event", checkJwt, (req, res) => {
+  models.Event.destroy({
+    where: {
+      id: req.body["id"],
+      createdBy: req.user.sub
+    }
+  }).then(() => {
+    handleSuccess(res, {});
+  }).catch(handleErr(res, 500))
+});
+
 // Create or save an event
-app.post('/api/event', checkJwt, (req, res) => {
+app.post('/api/event', checkJwt, async (req, res) => {
   let form = {};
 
   // Trim trailing/leading whitespace.
@@ -97,53 +127,73 @@ app.post('/api/event', checkJwt, (req, res) => {
   });
   form["day"] = req.body["day"];
 
-  models.Event.count({
+  let err = null;
+
+  let toUpdateEvent = await findAuthoredEvent(req.body["id"], req.user.sub).catch(
+    innerErr => err = getErr(innerErr)
+  );
+  if (err) {
+    handleErr(res, 500)(err);
+    return;
+  }
+
+  let exists = await models.Event.count({
     where: {
-      name: form.name
+      name: form.name,
+      id: {$notIn: [req.body["id"]]}
     }
-  }).then(count => {
-    let err = null;
-    if (count > 0) {
-      err = "Name is not unique";
-    } else if (!form.name) {
-      err = "Name is required";
-    } else if (form.name.length > 60) {
-      err = "Name is too long";
-    } else if (!form.startTime) {
-      err = "Start time is required";
-    } else if (!form.startTime.match(/^\d{2}:\d{2}$/)) {
-      err = "Internal error processign start time. Contact an administrator.";
-    } else if (!form.endTime.match(/^\d{2}:\d{2}$/)) {
-      err = "Internal error processing end time. Contact an administrator.";
-    } else if (!form.location) {
-      err = "Location is required";
-    } else if (form.location.length > 60) {
-      err = "Location is too long";
-    } if (form.description.length > 560) {
-      err = "Description is too long";
-    } else if (form.description.split(/\r\n|\r|\n/).length > 5) {
-      err = "Description has too many lines";
-    } else if (!form.description) {
-      err = "Description is required";
-    } else if (!form.day && form.day !== 0) {
-      err = "Day is missing. Contact an administrator";
-    } else if (!form.day.toString().match(/^\d+$/)) {
-      err = "Day not represented as integer. Contact an administrator.";
-    } else if (form.day > 4 || form.day < 0) {
-      err = "Day out of expected range. Contact an administrator.";
-    }
+  }).catch(innerErr => err = getErr(innerErr));
+  if (err) {
+    handleErr(res, 500)(err);
+    return;
+  }
 
-    if (err) {
-      handleErr(res, 400)(err);
-      return;
-    }
+  if (exists > 0) {
+    err = "Name is not unique";
+  } else if (!form.name) {
+    err = "Name is required";
+  } else if (form.name.length > 60) {
+    err = "Name is too long";
+  } else if (!form.startTime) {
+    err = "Start time is required";
+  } else if (!form.startTime.match(/^\d{2}:\d{2}$/)) {
+    err = "Internal error processign start time. Contact an administrator.";
+  } else if (!form.endTime.match(/^\d{2}:\d{2}$/)) {
+    err = "Internal error processing end time. Contact an administrator.";
+  } else if (!form.location) {
+    err = "Location is required";
+  } else if (form.location.length > 60) {
+    err = "Location is too long";
+  } if (form.description.length > 560) {
+    err = "Description is too long";
+  } else if (form.description.split(/\r\n|\r|\n/).length > 5) {
+    err = "Description has too many lines";
+  } else if (!form.description) {
+    err = "Description is required";
+  } else if (!form.day && form.day !== 0) {
+    err = "Day is missing. Contact an administrator";
+  } else if (!form.day.toString().match(/^\d+$/)) {
+    err = "Day not represented as integer. Contact an administrator.";
+  } else if (form.day > 4 || form.day < 0) {
+    err = "Day out of expected range. Contact an administrator.";
+  }
 
-    form["createdBy"] = req.user.sub;
+  if (err) {
+    handleErr(res, 400)(err);
+    return;
+  }
 
+  form["createdBy"] = req.user.sub;
+
+  if (toUpdateEvent === null) {
     models.Event.create(form).then(
       event => handleSuccess(res, {})
     ).catch(handleErr(res, 500));
-  }).catch(handleErr(res, 500));
+  } else {
+    toUpdateEvent.update(form).then(
+      () => handleSuccess(res, {})
+    ).catch(handleErr(res, 500));
+  }
 });
 
 // The "catchall" handler: for any request that doesn't

@@ -11,9 +11,13 @@ import {
   IconButton
 } from '@material-ui/core';
 
+import moment from 'moment';
+import axios from 'axios';
+
 import EventDialog from './EventDialog';
 
-import moment from 'moment';
+import getServerErr from '../util';
+import authClient from '../Auth';
 
 function convertDay(day) {
   return ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][day]
@@ -21,6 +25,19 @@ function convertDay(day) {
 
 function convertTime(time) {
   return moment(time, 'HH:mm').format('hh:mma');
+}
+
+function deleteEvent(id, callback) {
+  axios.delete("/api/event", {
+    data: {
+      id: id,
+    },
+    headers: {
+      'Authorization': `Bearer ${authClient.getIdToken()}`
+    }
+  }).then(callback).catch((err) => {
+    console.log("Error deleting event: " + getServerErr(err));
+  });
 }
 
 function EventList(props) {
@@ -65,16 +82,19 @@ function EventList(props) {
                   </tr>
                   <tr>
                     <td className="actionsCell">
-                      <div className="actions no-print">
-                        <EventDialog event={e}>
-                          <IconButton fontSize="small" >
-                            <Edit />
-                          </IconButton>
-                        </EventDialog>
-                        <IconButton fontSize="small">
-                          <Delete />
-                        </IconButton>
-                      </div>
+                      {
+                        authClient.isAuthenticated() && authClient.profile.sub === e.createdBy &&
+                          <div className="actions no-print">
+                            <EventDialog event={e} onSuccess={() => props.onChange()}>
+                              <IconButton fontSize="small" >
+                                <Edit />
+                              </IconButton>
+                            </EventDialog>
+                            <IconButton fontSize="small" onClick={() => deleteEvent(e.id, () => props.onChange())}>
+                              <Delete />
+                            </IconButton>
+                          </div>
+                      }
                     </td>
                     <td colSpan={2} className="desc">{e.description}</td>
                   </tr>

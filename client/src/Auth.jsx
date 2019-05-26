@@ -13,6 +13,7 @@ class Auth {
   getProfile() {
     return this.profile;
   }
+        color: white;
 
   getIdToken() {
     return this.idToken;

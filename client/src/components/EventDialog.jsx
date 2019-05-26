@@ -99,7 +99,11 @@ class EventDialog extends React.Component {
     }).then((resp) => {
       // Clear the form and communicate success. Leave it open.
       this.props.onSuccess();
-      this.setState({...this.initialState, open: true, success: true});
+      if (this.isEditMode()) {
+        this.setState({success: true, isLoading: false});
+      } else {
+        this.setState({...this.initialState, open: true, success: true});
+      }
     }).catch((err) => {
       this.setState({pageError: getServerErr(err), isLoading: false});
     });
@@ -195,7 +199,7 @@ class EventDialog extends React.Component {
             { this.state.success && <OurSnackbarContent
               onClose={() => this.setState({success: false})}
               variant="success"
-              message="Event added!"
+              message={this.isEditMode() ? "Event saved!" : "Event added!"}
               style={{marginBottom: 15}}
             />
             }

@@ -137,20 +137,7 @@ app.post('/api/event', checkJwt, async (req, res) => {
     return;
   }
 
-  let exists = await models.Event.count({
-    where: {
-      name: form.name,
-      id: {[Op.ne]: req.body["id"]}
-    }
-  }).catch(innerErr => err = getErr(innerErr));
-  if (err) {
-    handleErr(res, 500)(err);
-    return;
-  }
-
-  if (exists > 0) {
-    err = "Name is not unique";
-  } else if (!form.name) {
+  if (!form.name) {
     err = "Name is required";
   } else if (form.name.length > 60) {
     err = "Name is too long";

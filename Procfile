@@ -1,1 +1,1 @@
-release: rake db:migrate
+release: sequelize db:migrate

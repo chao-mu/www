@@ -1,11 +1,14 @@
 import auth0 from 'auth0-js';
 
 class Auth {
+  loc = window.location;
+  baseUrl = this.loc.protocol + "//" + this.loc.hostname + (this.loc.port? ":"+this.loc.port : "");
+
   clientID = '4qhDa1YiGaMibkZr0zKH0Tcx4nbzsg90';
   auth0 = new auth0.WebAuth({
     domain: 'dev-www.auth0.com',
     clientID: this.clientID,
-    redirectUri: 'http://localhost:3000/callback',
+    redirectUri: this.baseUrl + '/callback',
     responseType: 'token id_token',
     scope: 'openid'
   });
@@ -49,7 +52,7 @@ class Auth {
 
   logout() {
     this.auth0.logout({
-      returnTo: 'http://localhost:3000',
+      returnTo: this.baseUrl,
       clientID: this.clientID,
     });
   }

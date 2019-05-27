@@ -140,7 +140,7 @@ app.post('/api/event', checkJwt, async (req, res) => {
   let exists = await models.Event.count({
     where: {
       name: form.name,
-      id: {$notIn: [req.body["id"]]}
+      id: {[Op.ne]: req.body["id"]}
     }
   }).catch(innerErr => err = getErr(innerErr));
   if (err) {

@@ -249,11 +249,11 @@ class EventDialog extends React.Component {
                     value={this.state.day}
                     onChange={(event) => this.setState({day: event.target.value})}
                   >
-                    <MenuItem value="0">Tuesday</MenuItem>
-                    <MenuItem value="1">Wednesday</MenuItem>
-                    <MenuItem value="2">Thursday</MenuItem>
-                    <MenuItem value="3">Friday</MenuItem>
-                    <MenuItem value="4">Saturday</MenuItem>
+                    <MenuItem value={0}>Tuesday</MenuItem>
+                    <MenuItem value={1}>Wednesday</MenuItem>
+                    <MenuItem value={2}>Thursday</MenuItem>
+                    <MenuItem value={3}>Friday</MenuItem>
+                    <MenuItem value={4}>Saturday</MenuItem>
                   </Select>
                   <FormHelperText error>{this.state.dayError}</FormHelperText>
                 </FormControl>

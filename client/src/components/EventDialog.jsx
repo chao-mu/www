@@ -70,7 +70,7 @@ class EventDialog extends React.Component {
   };
 
   tooLongMsg = (maxLength) => {
-    return "Name is too long. Must be no more than " + maxLength + " characters";
+    return "Text is too long. Must be no more than " + maxLength + " characters";
   };
 
   requiredMsg = () => {
@@ -137,25 +137,25 @@ class EventDialog extends React.Component {
     }
 
     if (!this.state.location) {
-      this.setState({locError: this.requiredMsg()});
+      this.setState({locationError: this.requiredMsg()});
       okay = false;
     } else if (this.state.location.length > 60) {
-      this.setState({locError: this.tooLongMsg(60)});
+      this.setState({locationError: this.tooLongMsg(60)});
       okay = false;
     } else {
-      this.setState({locError: null});
+      this.setState({locationError: null});
     }
 
     if (this.state.description.length > 560) {
-      this.setState({descError: this.tooLongMsg(560)});
+      this.setState({descriptionError: this.tooLongMsg(560)});
       okay = false;
     } else if (this.state.description.split(/\r\n|\r|\n/).length > 5) {
-      this.setState({descError: "Field has too many lines. Must be no more than 5 lines"});
+      this.setState({descriptionError: "Field has too many lines. Must be no more than 5 lines"});
       okay = false;
     } else if (!this.state.description) {
-      this.setState({descError: this.requiredMsg()});
+      this.setState({descriptionError: this.requiredMsg()});
       okay = false;
-    } else { this.setState({descError: null});
+    } else { this.setState({descriptionError: null});
     }
 
     if (!okay) {

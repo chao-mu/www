@@ -345,7 +345,7 @@ class EventEntryPage extends React.Component {
               {/* Action Buttons */}
               <div className="actions">
                 <Button onClick={() => this.props.history.push("/") } color="primary" variant="outlined">
-                  Quit
+                  Back
                 </Button>
                 <Button onClick={this.handleSave} color="primary" variant="outlined">
                   Save

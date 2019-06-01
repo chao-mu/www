@@ -39,7 +39,7 @@ function convertTime(time) {
     return time;
   }
 
-  ["H:mma", "Ha", "H a", "H:mm a"].forEach((fmt) =>  {
+  ["h:mma", "ha", "h a", "h:mm a"].forEach((fmt) =>  {
     if (!t.isValid()) {
       t = moment(time, fmt, true);
     }
@@ -53,7 +53,7 @@ function convertTime(time) {
 }
 
 function prettyTime(time) {
-  return moment(time, "HH:mm").format("H:mma");
+  return moment(time, "HH:mm").format("h:mma");
 }
 
 class EventEntryPage extends React.Component {

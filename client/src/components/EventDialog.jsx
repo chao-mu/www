@@ -18,6 +18,7 @@ import {
 
 import LoadingOverlay from 'react-loading-overlay';
 
+import moment from 'moment';
 import axios from 'axios';
 
 import OurSnackbarContent from "./OurSnackbarContent";
@@ -30,6 +31,23 @@ const styles = theme => ({
     marginBottom: 15
   }
 });
+
+const timeFormatError = "Incorrect time format, expected times like 3:00pm or 15:00, 2:00am or 02:00";
+
+function convertTime(time) {
+  let t =  moment(time, 'HH:mm', true);
+  if (t.isValid()) {
+    return time;
+  }
+
+
+  t = moment(time, 'H:mma', true);
+  if (t.isValid()) {
+    return t.format("HH:mm");
+  }
+
+  return null;
+}
 
 class EventDialog extends React.Component {
   getEventField = (field) => {
@@ -90,8 +108,8 @@ class EventDialog extends React.Component {
       id: this.getEventField("id"),
       day: this.state.day,
       name: this.state.name,
-      startTime: this.state.startTime,
-      endTime: this.state.endTime,
+      startTime: convertTime(this.state.startTime),
+      endTime: convertTime(this.state.endTime),
       location: this.state.location,
       description: this.state.description,
     }, {
@@ -125,6 +143,8 @@ class EventDialog extends React.Component {
     if (!this.state.startTime) {
       this.setState({startTimeError: this.requiredMsg()});
       okay = false;
+    } else if (convertTime(this.state.startTime) === null) {
+      this.setState({startTimeError: timeFormatError});
     } else {
       this.setState({startTimeError: null});
     }
@@ -132,6 +152,8 @@ class EventDialog extends React.Component {
     if (!this.state.endTime) {
       this.setState({endTimeError: this.requiredMsg()});
       okay = false;
+    } else if (convertTime(this.state.endTime) === null) {
+      this.setState({endTimeError: timeFormatError});
     } else {
       this.setState({endTimeError: null});
     }
@@ -241,7 +263,7 @@ class EventDialog extends React.Component {
               </Grid>
 
               {/* Day dropdown */}
-              <Grid item xs={4}>
+              <Grid item xs={12}>
                 <FormControl>
                   <InputLabel htmlFor="day">Day</InputLabel>
                   <Select
@@ -260,13 +282,12 @@ class EventDialog extends React.Component {
               </Grid>
 
               {/* Start and end time pickers */}
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <TextField
                   error={this.state.startTimeError !== null}
                   value={this.state.startTime}
                   id="startTime"
                   label="Start Time"
-                  type="time"
                   onChange={(event) => this.setState({startTime: event.target.value})}
                   InputLabelProps={{
                     shrink: true,
@@ -277,12 +298,11 @@ class EventDialog extends React.Component {
                 />
                 <FormHelperText error>{this.state.startTimeError}</FormHelperText>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <TextField
                   id="startTime"
                   value={this.state.endTime}
                   label="End Time"
-                  type="time"
                   onChange={(event) => this.setState({endTime: event.target.value})}
                   InputLabelProps={{
                     shrink: true,

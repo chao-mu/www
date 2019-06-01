@@ -24,7 +24,7 @@ function convertDay(day) {
 }
 
 function convertTime(time) {
-  return moment(time, 'HH:mm').format('hh:mma');
+  return moment(time, 'HH:mm').format('h:mma');
 }
 
 function deleteEvent(id, callback) {

@@ -5,7 +5,6 @@ import {
 } from '@material-ui/core';
 
 import EventList from '../components/EventList';
-import EventDialog from '../components/EventDialog';
 import authClient from '../Auth';
 import getServerErr from '../util';
 
@@ -62,11 +61,9 @@ class Home extends React.Component {
           </Button>
           {
             authClient.isAuthenticated() &&
-              <EventDialog onSuccess={() => this.reloadEvents()}>
-                <Button variant="outlined" color="default">
-                  Add
-                </Button>
-              </EventDialog>
+              <Button variant="outlined" color="default" onClick={() => this.props.history.push("/add")}>
+                Add
+              </Button>
           }
           {
             !authClient.isAuthenticated() &&

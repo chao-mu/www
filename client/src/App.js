@@ -5,6 +5,7 @@ import {
 } from '@material-ui/core';
 
 import AppHeader from './components/AppHeader';
+import EventEntryPage from './pages/EventEntryPage';
 import Home from './pages/Home';
 import './App.scss';
 import authClient from './Auth'
@@ -37,6 +38,10 @@ class App extends React.Component {
         // Ignore
       }
     }
+
+    if (this.props.location.pathname !== "/" && !authClient.isAuthenticated()) {
+      authClient.login();
+    }
   }
 
   render() {
@@ -47,6 +52,8 @@ class App extends React.Component {
         <AppHeader />
         <main className={classes.main}>
           <Route exact path="/" component={Home}/>
+          <Route exact path="/add" component={EventEntryPage}/>
+          <Route exact path="/edit/:eventID" component={EventEntryPage}/>
         </main>
       </Fragment>
     );

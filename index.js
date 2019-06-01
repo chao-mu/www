@@ -58,6 +58,15 @@ let handleSuccess = (res, v) => {
 }
 
 // API endpoint to retrieve events
+app.get('/api/event', (req, res) => {
+  models.Event.findOne({
+    where: {id: req.query.id},
+    attributes: ["id", "createdBy", "name", "startTime", "endTime", "location", "description", "day"]
+  }).then(
+    (row) => handleSuccess(res, row)
+  ).catch(handleErr(res, 500));
+});
+
 app.get('/api/events', (req, res) => {
   models.Event.findAll({
     order: [

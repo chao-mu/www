@@ -14,7 +14,7 @@ import {
 import moment from 'moment';
 import axios from 'axios';
 
-import EventDialog from './EventDialog';
+import { withRouter } from 'react-router-dom'
 
 import getServerErr from '../util';
 import authClient from '../Auth';
@@ -85,11 +85,9 @@ function EventList(props) {
                       {
                         authClient.isAuthenticated() && authClient.profile.sub === e.createdBy &&
                           <div className="actions no-print">
-                            <EventDialog event={e} onSuccess={() => props.onChange()}>
-                              <IconButton fontSize="small" >
-                                <Edit />
-                              </IconButton>
-                            </EventDialog>
+                            <IconButton fontSize="small" onClick={() => props.history.push("/edit/" + e.id)}>
+                              <Edit />
+                            </IconButton>
                             <IconButton fontSize="small" onClick={() => deleteEvent(e.id, () => props.onChange())}>
                               <Delete />
                             </IconButton>
@@ -108,4 +106,4 @@ function EventList(props) {
   );
 }
 
-export default EventList;
+export default withRouter(EventList);

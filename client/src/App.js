@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import {
   CssBaseline,
-  withStyles,
 } from '@material-ui/core';
 
 import AppHeader from './components/AppHeader';
@@ -11,15 +10,6 @@ import './App.scss';
 import authClient from './Auth'
 
 import {withRouter, Route} from 'react-router-dom';
-
-const styles = theme => ({
-  main: {
-    padding: 3 * theme.spacing.unit,
-    [theme.breakpoints.down('xs')]: {
-      padding: 2 * theme.spacing.unit,
-    },
-  },
-});
 
 class App extends React.Component {
   async componentDidMount() {
@@ -45,12 +35,11 @@ class App extends React.Component {
   }
 
   render() {
-    const {classes} = this.props;
     return (
       <Fragment>
         <CssBaseline />
         <AppHeader />
-        <main className={classes.main}>
+        <main className="container">
           <Route exact path="/" component={Home}/>
           <Route exact path="/add" component={EventEntryPage}/>
           <Route exact path="/edit/:eventID" component={EventEntryPage}/>
@@ -60,4 +49,4 @@ class App extends React.Component {
   }
 };
 
-export default withRouter(withStyles(styles)(App));
+export default withRouter(App);

@@ -25,28 +25,39 @@ h3 {
 }
 
 main {
-    margin: 0px 90px; 
+    margin-top: 20px;
 }
 
-@media (max-width: 800px) {
-    main {
-        margin: 0px 20px; 
-    }
+.container {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
-@media (max-width: 600px) {
-    main {
-        margin: 0px 10px; 
-    }
+@media (min-width: 768px) {
+  .container {
+    width: 750px;
+  }
 }
-
-@media (max-width: 500px) {
-    main {
-        margin: 0px 5px; 
-    }
+@media (min-width: 992px) {
+  .container {
+    width: 970px;
+  }
+}
+@media (min-width: 1200px) {
+  .container {
+    width: 1170px;
+  }
 }
 
 p.intro {
     font-size: 1.3em;
     margin: 5px 0px 8px 0px;
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
 }

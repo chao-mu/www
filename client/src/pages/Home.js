@@ -49,15 +49,9 @@ class Home extends React.Component {
     return <div className="home">
       <div className="no-print">
         <h2>What/Where/When</h2>
-        <p className="intro">
-          Before you lies your next adventure. Like other aspects of Firefly, events are self-organized. Add an event and make it happen!
-        </p>
-        <div className="button-panel-left">
+        <div className="button-panel">
           <Button variant="outlined" color="primary" onClick={() => window.print()}>
             Print
-          </Button>
-          <Button variant="outlined" color="default" onClick={this.onExport}>
-            Export
           </Button>
           {
             authClient.isAuthenticated() &&
@@ -71,8 +65,6 @@ class Home extends React.Component {
                 Add
               </Button>
           }
-        </div>
-        <div className="button-panel-right">
           {
             !authClient.isAuthenticated() &&
               <Button
@@ -96,6 +88,9 @@ class Home extends React.Component {
               </Button>
           }
         </div>
+        <p className="intro">
+          Before you lies your next adventure. Like other aspects of Firefly, events are self-organized. Add an event and make it happen!
+        </p>
       </div>
       <EventList events={this.state.events} onChange={() => this.reloadEvents()}/>
     </div>

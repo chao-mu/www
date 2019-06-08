@@ -1,0 +1,62 @@
+.showHideToggle {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+
+table.events {
+    width: 100%;
+    box-sizing: border-box;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-size: 1em;
+    table-layout: auto;
+    
+    tr {
+        border-style: solid;
+        border-width: 1px;
+        border-color: #ddd;
+    }
+
+    td {
+        padding: 8px 14px;
+        vertical-align: top;
+    }
+
+    .list-heading {
+        border-bottom: 1px;
+        .day {
+            color: #666;
+            font-weight: 700;
+            border-top-width: 0;
+            background: #def2f6;
+            text-align: center;
+        }
+    }
+
+    .list-item:hover .details {
+        cursor: pointer; 
+        background-color: #f5f5f5;
+    }
+
+    .list-item {
+        .duration {
+            white-space: nowrap;
+            text-align: center;
+        }
+        .details {
+            width: 99%;
+            .name {
+                display: inline-block;
+                font-weight: bold;
+            }
+            .location {
+                display: inline-block;
+                margin-left: 10px;
+                font-variant: small-caps;
+                margin-bottom: 10px;
+            }
+        }
+    }
+}

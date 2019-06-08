@@ -42,11 +42,12 @@ table.events {
 
     .list-item {
         .duration {
-            white-space: nowrap;
             text-align: center;
+            width: 10%;
         }
+        
         .details {
-            width: 99%;
+            width: 90%;
             .name {
                 display: inline-block;
                 font-weight: bold;
@@ -58,5 +59,14 @@ table.events {
                 margin-bottom: 10px;
             }
         }
+    }
+}
+
+@media (min-width: 500px) {
+    .list-item .details {
+        width: 99%;
+    }
+    .list-item .duration {
+        white-space: nowrap;
     }
 }

@@ -5,6 +5,7 @@ import {
 
 import AppHeader from './components/AppHeader';
 import EventEntryPage from './pages/EventEntryPage';
+import BulkImportPage from './pages/BulkImportPage';
 import Home from './pages/Home';
 import './App.scss';
 import authClient from './Auth'
@@ -19,7 +20,8 @@ class App extends React.Component {
       } catch (err) {
         // ignore
       }
-      this.props.history.replace('/');
+      let ret = (new URLSearchParams(this.props.location.search)).get("return_to");
+      this.props.history.replace(ret);
     } else {
       try {
         await authClient.silentAuth();
@@ -30,7 +32,7 @@ class App extends React.Component {
     }
 
     if (this.props.location.pathname !== "/" && !authClient.isAuthenticated()) {
-      authClient.login();
+      authClient.login(this.props.location.pathname);
     }
   }
 
@@ -42,6 +44,7 @@ class App extends React.Component {
         <main className="container">
           <Route exact path="/" component={Home}/>
           <Route exact path="/add" component={EventEntryPage}/>
+          <Route exact path="/bulk" component={BulkImportPage}/>
           <Route exact path="/edit/:eventID" component={EventEntryPage}/>
         </main>
       </Fragment>

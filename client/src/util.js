@@ -1,4 +1,7 @@
-function getServerErr(err) {
+import moment from 'moment';
+
+export default {
+  getServerErr: (err) => {
     if (err.response === undefined) {
       return err;
     }
@@ -9,6 +12,24 @@ function getServerErr(err) {
     }
 
     return "Unknown server error";
- }
+  },
 
-export default getServerErr;
+  convertTime: (time) => {
+    let t =  moment(time, 'HH:mm', true);
+    if (t.isValid()) {
+      return time;
+    }
+
+    ["h:mma", "ha", "h a", "h:mm a"].forEach((fmt) =>  {
+      if (!t.isValid()) {
+        t = moment(time, fmt, true);
+      }
+    });
+
+    if (t.isValid()) {
+      return t.format("HH:mm");
+    }
+
+    return null;
+  }
+};

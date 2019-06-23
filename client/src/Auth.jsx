@@ -16,7 +16,6 @@ class Auth {
   getProfile() {
     return this.profile;
   }
-        color: white;
 
   getIdToken() {
     return this.idToken;
@@ -26,8 +25,8 @@ class Auth {
     return new Date().getTime() < this.expiresAt;
   }
 
-  login() {
-    this.auth0.authorize();
+  login(return_to="/") {
+    this.auth0.authorize({redirect_uri: this.baseUrl + '/callback?return_to=' + return_to});
   }
 
   handleAuthentication() {

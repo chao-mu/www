@@ -21,7 +21,7 @@ import moment from 'moment';
 import axios from 'axios';
 
 import OurSnackbarContent from "../components/OurSnackbarContent";
-import getServerErr from "../util";
+import util from '../util';
 
 import authClient from '../Auth';
 
@@ -32,25 +32,6 @@ const styles = theme => ({
 });
 
 const timeFormatError = "Incorrect time format, expected times like 3:00pm or 15:00, 2:00am or 02:00";
-
-function convertTime(time) {
-  let t =  moment(time, 'HH:mm', true);
-  if (t.isValid()) {
-    return time;
-  }
-
-  ["h:mma", "ha", "h a", "h:mm a"].forEach((fmt) =>  {
-    if (!t.isValid()) {
-      t = moment(time, fmt, true);
-    }
-  });
-
-  if (t.isValid()) {
-    return t.format("HH:mm");
-  }
-
-  return null;
-}
 
 function prettyTime(time) {
   return moment(time, "HH:mm").format("h:mma");
@@ -105,7 +86,7 @@ class EventEntryPage extends React.Component {
           isLoading: false,
         });
       }).catch((err) => {
-        this.setState({pageError: getServerErr(err), isLoading: false});
+        this.setState({pageError: util.getServerErr(err), isLoading: false});
       });
     }
   }
@@ -131,8 +112,8 @@ class EventEntryPage extends React.Component {
       id: this.isEditMode() ? this.state.id : null,
       day: this.state.day,
       name: this.state.name,
-      startTime: convertTime(this.state.startTime),
-      endTime: convertTime(this.state.endTime),
+      startTime: util.convertTime(this.state.startTime),
+      endTime: util.convertTime(this.state.endTime),
       location: this.state.location,
       description: this.state.description,
     }, {
@@ -144,7 +125,7 @@ class EventEntryPage extends React.Component {
         this.setState({...this.initialState, open: true, success: true});
       }
     }).catch((err) => {
-      this.setState({pageError: getServerErr(err), isLoading: false});
+      this.setState({pageError: util.getServerErr(err), isLoading: false});
     });
   }
 
@@ -164,7 +145,7 @@ class EventEntryPage extends React.Component {
     if (!this.state.startTime) {
       this.setState({startTimeError: this.requiredMsg()});
       okay = false;
-    } else if (convertTime(this.state.startTime) === null) {
+    } else if (util.convertTime(this.state.startTime) === null) {
       this.setState({startTimeError: timeFormatError});
     } else {
       this.setState({startTimeError: null});
@@ -173,7 +154,7 @@ class EventEntryPage extends React.Component {
     if (!this.state.endTime) {
       this.setState({endTimeError: this.requiredMsg()});
       okay = false;
-    } else if (convertTime(this.state.endTime) === null) {
+    } else if (util.convertTime(this.state.endTime) === null) {
       this.setState({endTimeError: timeFormatError});
     } else {
       this.setState({endTimeError: null});
@@ -198,7 +179,8 @@ class EventEntryPage extends React.Component {
     } else if (!this.state.description) {
       this.setState({descriptionError: this.requiredMsg()});
       okay = false;
-    } else { this.setState({descriptionError: null});
+    } else {
+      this.setState({descriptionError: null});
     }
 
     if (!okay) {

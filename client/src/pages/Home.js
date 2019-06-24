@@ -38,13 +38,9 @@ class Home extends React.Component {
       method: 'GET',
       responseType: 'blob', // important
     }).then((response) => {
-      var BOM = "\uFEFF";
-      const url = window.URL.createObjectURL(BOM + new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'ff-events_' + moment(Date.now()).format("YYYY-MM-DD_HH:mm:ss") + '.csv');
-      document.body.appendChild(link);
-      link.click();
+
+      let loc = window.location;
+      window.location.href = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : "") + "/api/events?format=csv";
     });
   }
 

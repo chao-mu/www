@@ -84,7 +84,7 @@ app.get('/api/events', (req, res) => {
         let events = results.map((e) => convertEventCSV(e));
 
         res.set("Content-Encoding", "UTF-8");
-        res.set("Content-Disposition", "attachment; filename=" + 'ff-events_' + moment(Date.now()).format("YYYY-MM-DD_HH:mm:ss") + '.csv');
+        res.set("Content-Disposition", "attachment; filename=" + 'ff-events_' + moment(Date.now()).format("YYYY-MM-DD_HH-mm-ss") + '.csv');
         res.set("Content-Type", "text/csv; charset=UTF-8");
 
         csvStringify(events, {header: true}, (err, output) => {

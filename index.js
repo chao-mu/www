@@ -77,11 +77,14 @@ app.get('/api/events', (req, res) => {
     attributes: ["id", "createdBy", "name", "startTime", "endTime", "location", "description", "day"]
   }).then(
     results => {
-      res.status(200);
       if (req.query.format === "csv") {
         let events = results.map((e) => convertEventCSV(e));
+        res.writeHead(200, {
+          "Content-Type": "text/html; charset=utf-8",
+          "Content-Disposition": "attachment"});
         csvStringify(events, {header: true}).pipe(res);
       } else {
+        res.status(200);
         let events = results.map((e) => e.dataValues);
         res.json(events);
       }

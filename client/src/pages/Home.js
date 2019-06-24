@@ -10,6 +10,8 @@ import getServerErr from '../util';
 
 import "./Home.scss";
 
+import moment from "moment";
+
 class Home extends React.Component {
   state = {
     events: []
@@ -36,10 +38,11 @@ class Home extends React.Component {
       method: 'GET',
       responseType: 'blob', // important
     }).then((response) => {
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      var BOM = "\uFEFF";
+      const url = window.URL.createObjectURL(BOM + new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'ff-events-' + Date.now() + '.csv');
+      link.setAttribute('download', 'ff-events_' + moment(Date.now()).format("YYYY-MM-DD_HH:mm:ss") + '.csv');
       document.body.appendChild(link);
       link.click();
     });

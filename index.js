@@ -34,9 +34,10 @@ let fromMilitary = (time) => moment(time, 'HH:mm').format('hh:mma');
 let convertEventCSV = (event) => {
   const days = ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   let row = {};
-  row["name"] = event.name;
+  row["day"] = days[event.day];
   row["start time"] = fromMilitary(event.startTime);
   row["end time"] = fromMilitary(event.endTime);
+  row["name"] = event.name;
   row["location"] = event.location;
   row["description"] = event.description
   return row;

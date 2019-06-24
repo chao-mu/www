@@ -53,6 +53,10 @@ class Home extends React.Component {
           <Button variant="outlined" color="primary" onClick={() => window.print()}>
             Print
           </Button>
+          <Button variant="outlined" color="default" onClick={() => this.onExport()}>
+            Export
+          </Button>
+
           {
             authClient.isAuthenticated() &&
               <Button variant="outlined" color="default" onClick={() => this.props.history.push("/add")}>

@@ -98,16 +98,17 @@ class EventList extends React.Component {
           </Button>
         </div>
 
-        <table className="events">
-        <tbody>
-          {
-            Object.keys(byDay).map(day => (
-              <React.Fragment key={"day-" + day}>
+        {
+          Object.keys(byDay).map(day => (
+            <table key={"day-" + day} className="events">
+              <thead>
                 <tr className="list-heading">
                   <td className="day" colSpan={2}>
                     { convertDay(day) }
                   </td>
                 </tr>
+              </thead>
+              <tbody>
                 {
                   byDay[day].map(e => (
                     <tr key={"event-" + e.id} className="list-item">
@@ -140,12 +141,11 @@ class EventList extends React.Component {
                     </tr>
                   ))
                 }
-              </React.Fragment>
-            ))
-          }
-        </tbody>
-      </table>
-    </React.Fragment>
+              </tbody>
+            </table>
+          ))
+        }
+      </React.Fragment>
     );
   }
 }

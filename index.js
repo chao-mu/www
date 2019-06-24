@@ -31,14 +31,15 @@ app.use(cors());
 let fromMilitary = (time) => moment(time, 'HH:mm').format('hh:mma');
 
 // Convert an Event entity to a displayable plain object
-let convertEventDisplayable = (event) => {
+let convertEventCSV = (event) => {
   const days = ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  event = event.dataValues;
-  event.day = days[event.day];
-  event.startTime = fromMilitary(event.startTime);
-  event.endTime = fromMilitary(event.endTime);
-  delete event.createdBy;
-  return event;
+  let row = {};
+  row["name"] = event.name;
+  row["start time"] = fromMilitary(event.startTime);
+  row["end time"] = fromMilitary(event.endTime);
+  row["location"] = event.location;
+  row["description"] = event.description
+  return row;
 }
 
 let getErr = (err) => typeof err === "string" ? err : err.message;
@@ -78,7 +79,7 @@ app.get('/api/events', (req, res) => {
     results => {
       res.status(200);
       if (req.query.format === "csv") {
-        let events = results.map((e) => convertEventDisplayable(e));
+        let events = results.map((e) => convertEventCSV(e));
         csvStringify(events, {header: true}).pipe(res);
       } else {
         let events = results.map((e) => e.dataValues);
